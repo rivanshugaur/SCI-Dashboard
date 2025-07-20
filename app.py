@@ -12,10 +12,10 @@ from urllib.parse import quote_plus
 # Database configuration
 DB_CONFIG = {
     "user": "root",
-    "password": "Stcs@9978",
-    "host": "localhost",
-    "port": "3306",
-    "name": "sci_db"
+    "password": "LSrqVWjJJeexcYUtPijebYrdYTKfFtHy", 
+    "host": "hopper.proxy.rlwy.net",
+    "port": "42510",
+    "name": "railway"
 }
 
 # KPI columns

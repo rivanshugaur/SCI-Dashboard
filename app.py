@@ -276,11 +276,11 @@ def display_kpi_summary(df, kpi_cols):
 
 def create_bar_chart(df, x, y, color=None, facet_col=None, 
                      barmode="group", text_auto=True, width=1000, facet_col_wrap=None):
-    
-    # Format bar text: show Paid or Credit
-    df["formatted_text"] = df[y].apply(
-        lambda val: f"₹{abs(val):,.2f} ({'Debit' if val >= 0 else 'Credit'})"
-    )
+    # Format bar text: show Paid or Credit, only add if not present
+    if "formatted_text" not in df.columns:
+        df["formatted_text"] = df[y].apply(
+            lambda val: f"₹{abs(val):,.2f} ({'Debit' if val >= 0 else 'Credit'})"
+        )
     """Standardized bar chart"""
     fig = px.bar(
         df,
@@ -422,11 +422,15 @@ def yearly_analysis(df):
         kpi_df = filtered_df[["year", kpi]].groupby("year").sum().reset_index()
         
         with tab1:
+            if "formatted_text" not in kpi_df.columns:
+                kpi_df["formatted_text"] = kpi_df[kpi].apply(
+                    lambda val: f"₹{abs(val):,.2f} ({'Debit' if val >= 0 else 'Credit'})"
+                )
             fig = px.bar(
                 kpi_df, 
                 x="year", 
                 y=kpi,
-                text=kpi,
+                text="formatted_text",
                 color_discrete_sequence=[KPI_COLORS[kpi]]
             )
             fig.update_layout(
@@ -525,11 +529,24 @@ def monthly_analysis(df):
         kpi_df = kpi_df.sort_values(by=["year", "month_index"])
 
         with tab1:
-            fig = create_line_chart(
-                kpi_df, 
-                x="month_year", 
+            if "formatted_text" not in kpi_df.columns:
+                kpi_df["formatted_text"] = kpi_df[kpi].apply(
+                    lambda val: f"₹{abs(val):,.2f} ({'Debit' if val >= 0 else 'Credit'})"
+                )
+            fig = px.bar(
+                kpi_df,
+                x="month_year",
                 y=kpi,
-                title=f"{kpi} Monthly Trend"
+                text="formatted_text",
+                color_discrete_sequence=[KPI_COLORS[kpi]]
+            )
+            fig.update_layout(
+                title=f"{kpi} Monthly Trend",
+                xaxis_title="Month-Year",
+                yaxis_title="₹ (Lacs)",
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='white')
             )
             st.plotly_chart(fig, use_container_width=True)
             
@@ -608,11 +625,15 @@ def quarterly_analysis(df):
         kpi_df["quarter_year"] = kpi_df["quarter"] + " " + kpi_df["year"].astype(str)
 
         with tab1:
+            if "formatted_text" not in kpi_df.columns:
+                kpi_df["formatted_text"] = kpi_df[kpi].apply(
+                    lambda val: f"₹{abs(val):,.2f} ({'Debit' if val >= 0 else 'Credit'})"
+                )
             fig = px.bar(
                 kpi_df, 
                 x="quarter_year", 
                 y=kpi,
-                text=kpi,
+                text="formatted_text",
                 color_discrete_sequence=[KPI_COLORS[kpi]]
             )
             fig.update_layout(
